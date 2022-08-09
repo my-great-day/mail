@@ -130,15 +130,3 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'idibek200tjk@gmail.com'
 EMAIL_HOST_PASSWORD = 'gksqgbzsrpfxitrc'
-
-
-"""
-send_mail(
-    'Subject here',
-    'Here is the message.',     
-    'idibek200tjk@gmail.com',
-    ['idibek200@yandex.com'],
-    fail_silently=False,
-)
-
-"""
