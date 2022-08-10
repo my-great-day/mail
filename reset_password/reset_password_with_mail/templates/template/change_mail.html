@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<label>Сбросить пароль</label>
+<form method="post">
+    {% csrf_token %}
+    <input type="password" placeholder="Новый пароль" name="password_field1" id="id_password_field1"><br>
+    <input type="password" placeholder="Потвердите пароль" name="password_field2" id="id_password_field2">
+    <input type="submit" value="Сбросить пароль">
+</form>
+{{msg}}
+</body>
+</html>

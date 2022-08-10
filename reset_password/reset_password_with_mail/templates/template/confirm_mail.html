@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mail</title>
+</head>
+<body>
+<label>Сброс пароля</label>
+<form method="post">
+    {% csrf_token %}
+    <input type="number" placeholder="Укажите код" name="number_field" id="id_number_field"><br>
+    <input type="submit" value="Отправить">
+</form>
+{{msg}}
+</body>
+</html>
