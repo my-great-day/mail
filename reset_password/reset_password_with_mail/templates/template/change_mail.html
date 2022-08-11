@@ -7,11 +7,41 @@
 <body>
 <label>Сбросить пароль</label>
 <form method="post">
-    {% csrf_token %}
     <input type="password" placeholder="Новый пароль" name="password_field1" id="id_password_field1"><br>
     <input type="password" placeholder="Потвердите пароль" name="password_field2" id="id_password_field2">
-    <input type="submit" value="Сбросить пароль">
+    <input type="submit" id="sub" value="Сбросить пароль">
 </form>
-{{msg}}
+<script>
+    const sub = document.getElementById('sub')
+    const passValue = document.getElementById('id_password_field1');
+    const passValue2 = document.getElementById('id_password_field2');
+    const mail = localStorage.getItem("mail")
+
+
+    sub.addEventListener('click', (e) => {
+        e.preventDefault()
+        handlePost()
+    })
+
+    const handlePost = () => {
+         fetch('http://127.0.0.1:8000/reset/confirm/change/', {
+        method : 'POST',
+        credentials: 'same-origin',
+        headers : {
+            'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({
+            mail : mail,
+            password_field1 : passValue.value,
+            password_field2 : passValue2.value,
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+                localStorage.clear()
+                window.location.href='/index.html'
+            })
+     }
+</script>
 </body>
 </html>

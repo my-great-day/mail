@@ -7,10 +7,39 @@
 <body>
 <label>Сброс пароля</label>
 <form method="post">
-    {% csrf_token %}
     <input type="number" placeholder="Укажите код" name="number_field" id="id_number_field"><br>
-    <input type="submit" value="Отправить">
+    <input type="submit" id="sub" value="Отправить">
 </form>
-{{msg}}
+<script>
+    const sub = document.getElementById('sub')
+    const login = document.getElementById('id_number_field');
+    const mail = localStorage.getItem("mail")
+
+
+    console.log(mail)
+    sub.addEventListener('click', (e) => {
+        e.preventDefault()
+        handlePost()
+    })
+
+    const handlePost = () => {
+         fetch('http://127.0.0.1:8000/reset/confirm/', {
+        method : 'POST',
+        credentials: 'same-origin',
+        headers : {
+            'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({
+            mail : mail,
+            number_field : login.value,
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+
+                window.location.href='/change_mail.html'
+            })
+     }
+</script>
 </body>
 </html>

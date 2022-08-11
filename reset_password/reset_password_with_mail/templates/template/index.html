@@ -7,12 +7,37 @@
 <body>
 <label>Вход</label>
 <form method="post">
-    {% csrf_token %}
-    <input type="email" placeholder="Логин" name="email_field" id="id_email_field"><br>
+    <input type="email" value="" placeholder="Логин" name="email_field" id="id_email_field"><br>
     <input type="password" placeholder="Пароль" name="password_field" id="id_password_field">
-    <input type="submit" value="Войти">
+    <input type="submit" id="sub" value="Войти">
 </form>
-<li><a href="{% url 'reset' %}">Забыли пароль!</a></li>
-{{msg}}
+<li><a href="reset_password.html">Забыли пароль!</a></li>
+<script>
+    const sub = document.getElementById('sub')
+    const login = document.getElementById('id_email_field');
+    const pass = document.getElementById('id_password_field');
+
+    sub.addEventListener('click', (e) => {
+        e.preventDefault()
+        handlePost()
+    })
+
+    const handlePost = () => {
+         fetch('http://127.0.0.1:8000', {
+        method : 'POST',
+        headers : {
+            'Content-Type': 'application/json'
+        },
+        body : JSON.stringify({
+            email_field : login.value,
+            password_field : pass.value,
+        })
+      })
+        .then(res => res.json())
+            .then(data => console.log(data))
+
+     }
+
+</script>
 </body>
 </html>
