@@ -25,7 +25,7 @@ def index(request):
 def send_reset_mail(request):
     _login = request.data.get('email_field')
     if _login and Users.objects.filter(login=_login).first():
-        check_code(_login, func_send_reset_mail(_login))
+        set_check_code(_login, func_send_reset_mail(_login))
         return Response({'msg': 'Hello!'})
 
     return Response(status=status.HTTP_404_NOT_FOUND)
@@ -35,7 +35,7 @@ def send_reset_mail(request):
 def confirm_mail(request):
     _mail = request.data.get('mail')
     _number = request.data.get('number_field')
-    if check_code2(_mail, _number):
+    if get_check_code(_mail, _number):
         return Response({'msg': 'Hello!'})
 
     return Response(status=status.HTTP_404_NOT_FOUND)
@@ -66,7 +66,7 @@ def func_send_reset_mail(login) -> int:
     return _random_number
 
 
-def check_code(mail, number):
+def set_check_code(mail, number):
     code = Code.objects.filter(mail=mail).first()
     if code:
         if code.code != number and code.mail == mail:
@@ -78,7 +78,7 @@ def check_code(mail, number):
         code.save()
 
 
-def check_code2(mail, number) -> bool:
+def get_check_code(mail, number) -> bool:
     code = Code.objects.filter(mail=mail).first()
     if code.code == number and code.mail == mail:
         return True
