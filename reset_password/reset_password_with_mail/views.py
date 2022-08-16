@@ -7,7 +7,7 @@ from .check_bd import get_check_code, set_check_code, save_password
 from .models import Users
 
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 def index(request):
     """Основной функция странице index"""
     if request.method == 'POST':
