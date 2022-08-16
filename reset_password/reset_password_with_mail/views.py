@@ -1,86 +1,56 @@
-import random
-from typing import Tuple, Any
-
-from django.conf import settings
-from django.core.mail import send_mail
+from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from .models import Users, Code
+
+from .check_bd import get_check_code, set_check_code, save_password
+from .models import Users
 
 
-# Create your views here.
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 def index(request):
+    """Основной функция странице index"""
     if request.method == 'POST':
         _login = request.data.get('email_field')
         _password = request.data.get('password_field')
         if _login and _password and Users.objects.filter(login=_login, password=_password).first():
-            return Response({'msg': 'Hello'})
+            return Response(status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response({'msg': 'Неверно введен логин или пароль!'}, status=status.HTTP_302_FOUND)
 
 
 @api_view(['POST'])
 def send_reset_mail(request):
+    """Функция отправляет код с подверждениям"""
     _login = request.data.get('email_field')
     if _login and Users.objects.filter(login=_login).first():
-        set_check_code(_login, func_send_reset_mail(_login))
-        return Response({'msg': 'Hello!'})
+        token = Token.generate_key()
+        set_check_code(_login, token)
+        return Response({'token': token}, status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response({'msg': 'Неверно введен логин!'}, status=status.HTTP_302_FOUND)
 
 
 @api_view(['POST'])
 def confirm_mail(request):
+    """Функция потверждает отправленный код"""
     _mail = request.data.get('mail')
     _number = request.data.get('number_field')
     if get_check_code(_mail, _number):
-        return Response({'msg': 'Hello!'})
+        return Response(status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response({'msg': 'Неверно введен код!'}, status=status.HTTP_302_FOUND)
 
 
 @api_view(['POST'])
 def change_mail(request):
+    """Функция изменяет пароль"""
     _mail = request.data.get('mail')
     _password1 = request.data.get('password_field1')
     _password2 = request.data.get('password_field2')
-    if _password1 == _password2 and _mail:
-        user = Users.objects.filter(login=_mail).first()
-        user.password = _password1
-        user.save()
-        return Response({'msg': 'Hello!'})
+    if save_password(_password1, _password2, _mail):
+        return Response(status=status.HTTP_200_OK)
 
-    return Response(status=status.HTTP_404_NOT_FOUND)
+    return Response({'msg': 'Пароль не совпадает\nПоля должнен быт одинаковым!!'}, status=status.HTTP_302_FOUND)
 
 
-def func_send_reset_mail(login) -> int:
-    _random_number = random.randint(100000, 999999)
-    subject = 'Отправиль Wee компания'
-    message = f'Ваш 6-значный код для потверждение: {_random_number}'
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [login, ]
-
-    send_mail(subject, message, email_from, recipient_list)
-    return _random_number
-
-
-def set_check_code(mail, number):
-    code = Code.objects.filter(mail=mail).first()
-    if code:
-        if code.code != number and code.mail == mail:
-            code = Code.objects.filter(mail=mail).first()
-            code.code = number
-            code.save()
-    else:
-        code = Code(mail=mail, code=func_send_reset_mail(mail))
-        code.save()
-
-
-def get_check_code(mail, number) -> bool:
-    code = Code.objects.filter(mail=mail).first()
-    if code.code == number and code.mail == mail:
-        return True
-
-    return False

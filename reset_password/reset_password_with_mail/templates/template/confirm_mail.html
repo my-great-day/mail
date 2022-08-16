@@ -5,7 +5,8 @@
     <title>Mail</title>
 </head>
 <body>
-<label>Сброс пароля</label>
+<label>Сброс пароля</label><br>
+<label>Мы отправили код потверждения на Вашу почту</label>
 <form method="post">
     <input type="number" placeholder="Укажите код" name="number_field" id="id_number_field"><br>
     <input type="submit" id="sub" value="Отправить">
@@ -13,19 +14,22 @@
 <script>
     const sub = document.getElementById('sub')
     const login = document.getElementById('id_number_field');
-    const mail = localStorage.getItem("mail")
+    const mail = sessionStorage.getItem("mail")
 
-
-    console.log(mail)
+    if (mail){
     sub.addEventListener('click', (e) => {
         e.preventDefault()
+        if (login.value){
         handlePost()
-    })
+        }
+    })}
+    else {
+        window.location.href='/index.html'
+    }
 
     const handlePost = () => {
          fetch('http://127.0.0.1:8000/reset/confirm/', {
         method : 'POST',
-        credentials: 'same-origin',
         headers : {
             'Content-Type': 'application/json'
         },
@@ -34,10 +38,16 @@
             number_field : login.value,
         })
       })
-        .then(res => res.json())
-        .then(data => {
+        .then(res => {
+            if (res.ok){
                 window.location.href='/change_mail.html'
-            })
+            }
+            else if(res.status === 302){
+                return res.json().then(data => {
+                    alert(data['msg'])
+                })
+            }
+        })
      }
 </script>
 </body>
